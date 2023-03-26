@@ -1,0 +1,6 @@
+{
+    "type": "sqlite",
+    "database": "C:\\sqlite\\TheBands.db",
+    "entities": ["src/**/*.entity.ts"],
+    "synchronize": true
+}
