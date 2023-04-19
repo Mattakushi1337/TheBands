@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { hashPassword } from 'src/utils/hash-password.util';
+import { compare } from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -22,11 +23,24 @@ export class UserService {
         }
     }
 
-    async findByLoginAndPassword(login: string, password: string) {
-        const user = await this.userRepository.findOne({ where: { login, password } });
+    async findByLoginAndPassword(login: string, password: string): Promise<User> {
+        const user = await this.userRepository.findOne({ where: { login } });
         if (!user) {
             throw new HttpException('Invalid login or password', HttpStatus.UNAUTHORIZED)
         }
+        const isPasswordValid = await compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new HttpException('Invalid login or password', HttpStatus.UNAUTHORIZED)
+        }
+        return user;
+    }
+
+    async findByLogin(login: string): Promise<User> {
+        const user = await this.userRepository.findOne({ where: { login } });
+        return user;
+    }
+    async findById(id: number): Promise<User> {
+        const user = await this.userRepository.findOne({ where: { id } });
         return user;
     }
 
