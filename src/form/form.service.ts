@@ -1,18 +1,21 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Form } from './form.entity';
 import { User } from 'src/user/user.entity';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class FormService {
     constructor(
         @InjectRepository(Form)
         private readonly formRepository: Repository<Form>,
+        private readonly userService: UserService
     ) { }
 
-    async findAll(): Promise<Form[]> {
-        return this.formRepository.find();
+    async findAll(userId: number): Promise<Form[]> {
+        const forms = await this.formRepository.find({ where: { userID: userId } });
+        return forms;
     }
 
     async findOne(id: number): Promise<Form> {
@@ -31,24 +34,30 @@ export class FormService {
         newForm.musicalInstrument = form.musicalInstrument;
         newForm.description = form.description;
         console.log(newForm);
-      
+
         const result = await this.formRepository
-          .createQueryBuilder()
-          .insert()
-          .into(Form)
-          .values(newForm)
-          .execute();
-      
+            .createQueryBuilder()
+            .insert()
+            .into(Form)
+            .values(newForm)
+            .execute();
+
         return { ...newForm, id: result.identifiers[0].id };
-      }
+    }
 
 
 
-    async update(id: number, form: Form): Promise<void> {
+    async update(id: number, form: Form): Promise<Form> {
         await this.formRepository.update(id, form);
+        return await this.formRepository.findOne({ where: { id } });
     }
 
     async delete(id: number): Promise<void> {
         await this.formRepository.delete(id);
+    }
+
+    async canEditForm(userId: number, formId: number): Promise<boolean> {
+        const form = await this.formRepository.findOne({ where: { id: formId } });
+        return form && form.userID === userId;
     }
 }

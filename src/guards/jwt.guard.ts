@@ -3,24 +3,23 @@ import { AuthService } from "src/auth/auth.service";
 
 @Injectable()
 export class JwtGuard implements CanActivate {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.split(' ')[1];
-
-    console.log('token:', token); // <--- добавьте эту строку
+    const token = request.cookies['access_token'];
+    console.log('token:', token);
 
     if (!token) {
       return false;
     }
 
     try {
-      const user = this.authService.verifyToken(token); 
+      const decodedToken = this.authService.verifyToken(token);
 
-      console.log('user:', user); // <--- добавьте эту строку
+      console.log('decoded token:', decodedToken); 
 
-      request.user = user;
+      request.user = decodedToken;
       return true;
     } catch (err) {
       throw new UnauthorizedException();

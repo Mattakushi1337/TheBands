@@ -6,7 +6,6 @@ import { LocalStrategy } from 'src/guards/local.strategy';
 import { JwtStrategy } from 'src/guards/jwt.strategy';
 import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity';
 
 @Module({

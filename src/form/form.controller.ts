@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Req, BadRequestException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Req, BadRequestException, UseGuards, ForbiddenException } from '@nestjs/common';
 import { FormService } from './form.service';
 import { Form } from './form.entity';
 import { UserService } from 'src/user/user.service';
@@ -7,11 +7,6 @@ import { JwtGuard } from 'src/guards/jwt.guard';
 @Controller('form')
 export class FormController {
     constructor(private readonly formService: FormService, private readonly userService: UserService) { }
-    
-    @Get()
-    async findAll(): Promise<Form[]> {
-        return this.formService.findAll();
-    }
 
     @Get(':id')
     async findOne(@Param('id') id: string): Promise<Form> {
@@ -25,20 +20,40 @@ export class FormController {
         try {
             const userId = req.cookies.userId;
             const user = await this.userService.findById(userId);
-            return await this.formService.create(req.user, form);
+            return await this.formService.create(user, form);
         } catch (error) {
             console.error(error);
             throw new BadRequestException('Failed to create form');
         }
     }
 
+    @UseGuards(JwtGuard)
     @Put(':id')
-    async update(@Param('id') id: string, @Body() form: Form): Promise<void> {
-        await this.formService.update(parseInt(id), form);
+    async update(@Param('id') id: string, @Body() form: Form, @Req() req: any) {
+        console.log('req.user:', req.user); // <--- добавьте эту строку
+        const userId = req.cookies.userId;
+        if (!await this.formService.canEditForm(parseInt(userId), parseInt(id))) {
+            throw new ForbiddenException(`User with id ${userId} cannot edit form with id ${id}`);
+        }
+        const updatedForm = await this.formService.update(parseInt(id), form);
+        return updatedForm;
     }
 
+    @UseGuards(JwtGuard)
+    @Get()
+    async findAll(@Req() req: Request) {
+        const userId = req.cookies.userId;
+        const forms = await this.formService.findAll(userId);
+        return forms;
+    }
+
+    @UseGuards(JwtGuard)
     @Delete(':id')
-    async delete(@Param('id') id: string): Promise<void> {
+    async delete(@Param('id') id: string, @Req() req: any): Promise<void> {
+        const userId = req.cookies.userId;
+        if (!await this.formService.canEditForm(parseInt(userId), parseInt(id))) {
+            throw new ForbiddenException(`User with id ${userId} cannot delete form with id ${id}`);
+        }
         await this.formService.delete(parseInt(id));
     }
 }
