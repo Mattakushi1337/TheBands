@@ -10,13 +10,22 @@ import { FormController } from './form/form.controller';
 import { UserModule } from './user/user.module';
 import { FormModule } from './form/form.module';
 import { Form } from './form/form.entity';
+import { BandService } from './band/band.service';
+import { BandController } from './band/band.controller';
+import { BandModule } from './band/band.module';
+import { Band } from './band/band.entity';
+import { Member } from './member/member.entity';
+import { ApplicationController } from './application/application.controller';
+import { ApplicationService } from './application/application.service';
+import { ApplicationModule } from './application/application.module';
+import { Application } from './application/application.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'C:/sqlite/TheBands.db',
-      entities: [User, Form],
+      entities: [User, Form, Band, Application, Member],
       synchronize: false
     }),
     TypeOrmModule.forFeature([User]),
@@ -26,10 +35,15 @@ import { Form } from './form/form.entity';
     }),
     UserModule,
     FormModule,
+    BandModule,
+    ApplicationModule,
     TypeOrmModule.forFeature([Form]),
+    TypeOrmModule.forFeature([Band]),
+    TypeOrmModule.forFeature([Application]),
+    TypeOrmModule.forFeature([Member]),
   ],
-  controllers: [AuthController, FormController],
-  providers: [UserService, AuthService, FormService],
+  controllers: [AuthController, FormController, BandController, ApplicationController],
+  providers: [UserService, AuthService, FormService, BandService, ApplicationService],
   exports: [UserService, AuthService]
 })
 export class AppModule { }

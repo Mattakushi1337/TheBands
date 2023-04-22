@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Req, BadRequestExcepti
 import { FormService } from './form.service';
 import { Form } from './form.entity';
 import { UserService } from 'src/user/user.service';
-import { CookieOptions, Request } from 'express';
+import { Request } from 'express';
 import { JwtGuard } from 'src/guards/jwt.guard';
 @Controller('form')
 export class FormController {
@@ -29,7 +29,7 @@ export class FormController {
 
     @UseGuards(JwtGuard)
     @Put(':id')
-    async update(@Param('id') id: string, @Body() form: Form, @Req() req: any) {
+    async update(@Param('id') id: string, @Body() form: Form, @Req() req: Request) {
         console.log('req.user:', req.user); // <--- добавьте эту строку
         const userId = req.cookies.userId;
         if (!await this.formService.canEditForm(parseInt(userId), parseInt(id))) {
@@ -39,12 +39,20 @@ export class FormController {
         return updatedForm;
     }
 
+
+
     @UseGuards(JwtGuard)
-    @Get()
+    @Get('form/myForm')
     async findAll(@Req() req: Request) {
         const userId = req.cookies.userId;
         const forms = await this.formService.findAll(userId);
+        console.log(forms);
         return forms;
+    }
+
+    @Get('form/all')
+    async allForms(): Promise<Form[]> {
+        return await this.formService.allForms();
     }
 
     @UseGuards(JwtGuard)

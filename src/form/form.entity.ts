@@ -9,7 +9,6 @@ export class Form {
   @OneToOne(() => User, user => user.form)
   user: User;
 
-
   @Column()
   userID: number; 
 
@@ -30,4 +29,7 @@ export class Form {
 
   @Column()
   description: string;
+
+  @Column()
+  communication: string;
 }

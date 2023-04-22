@@ -3,18 +3,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Form } from './form.entity';
 import { User } from 'src/user/user.entity';
-import { UserService } from '../user/user.service';
 
 @Injectable()
 export class FormService {
     constructor(
         @InjectRepository(Form)
         private readonly formRepository: Repository<Form>,
-        private readonly userService: UserService
     ) { }
 
+
+    async allForms(): Promise<Form[]> {
+        return await this.formRepository.find();
+    }
+
+
     async findAll(userId: number): Promise<Form[]> {
+        console.log(userId)
         const forms = await this.formRepository.find({ where: { userID: userId } });
+        console.log(userId)
+        console.log(forms)
         return forms;
     }
 
@@ -33,6 +40,7 @@ export class FormService {
         newForm.gender = form.gender;
         newForm.musicalInstrument = form.musicalInstrument;
         newForm.description = form.description;
+        newForm.communication = form.communication;
         console.log(newForm);
 
         const result = await this.formRepository
