@@ -14,5 +14,8 @@ export class Application {
     band: Band;
 
     @Column()
-    status: string
+    status: string;
+
+    @Column()
+    role: string;
 }

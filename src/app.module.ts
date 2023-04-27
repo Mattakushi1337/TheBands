@@ -19,6 +19,9 @@ import { ApplicationController } from './application/application.controller';
 import { ApplicationService } from './application/application.service';
 import { ApplicationModule } from './application/application.module';
 import { Application } from './application/application.entity';
+import { Repository } from 'typeorm';
+import { MemberService } from './member/member.service';
+import { MemberModule } from './member/member.module';
 
 @Module({
   imports: [
@@ -28,6 +31,7 @@ import { Application } from './application/application.entity';
       entities: [User, Form, Band, Application, Member],
       synchronize: false
     }),
+    TypeOrmModule.forFeature([Repository]),
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
       secret: 'JWT_SECRET',
@@ -41,9 +45,11 @@ import { Application } from './application/application.entity';
     TypeOrmModule.forFeature([Band]),
     TypeOrmModule.forFeature([Application]),
     TypeOrmModule.forFeature([Member]),
+    MemberModule,
+
   ],
   controllers: [AuthController, FormController, BandController, ApplicationController],
-  providers: [UserService, AuthService, FormService, BandService, ApplicationService],
+  providers: [UserService, AuthService, FormService, BandService, ApplicationService, Repository, MemberService],
   exports: [UserService, AuthService]
 })
 export class AppModule { }

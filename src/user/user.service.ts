@@ -12,11 +12,12 @@ export class UserService {
         private readonly userRepository: Repository<User>,
     ) { }
 
-    async create(login: string, password: string) {
+    async create(login: string, password: string, userName: string) {
         try {
             const user = new User();
             user.login = login;
             user.password = await hashPassword(password);
+            user.userName = userName;
             return await this.userRepository.save(user);
         } catch (error) {
             throw new HttpException('This login already used', HttpStatus.NOT_ACCEPTABLE)

@@ -10,13 +10,15 @@ import { ApplicationService } from './application.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
+import { Repository } from 'typeorm';
+import { Member } from 'src/member/member.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Application, Band, User]), JwtModule.register({
+    imports: [TypeOrmModule.forFeature([Application, Band, User, Member, Repository]), JwtModule.register({
         secret: 'JWT_SECRET',
         signOptions: { expiresIn: '1d' },
     }), BandModule],
-    providers: [AuthService, ApplicationService, UserService],
+    providers: [AuthService, ApplicationService, UserService, Repository],
     controllers: [ApplicationController],
 })
 export class ApplicationModule { }

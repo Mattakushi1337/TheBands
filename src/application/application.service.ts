@@ -1,9 +1,10 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Application } from './application.entity';
 import { User } from 'src/user/user.entity';
 import { Band } from 'src/band/band.entity';
+import { Member } from 'src/member/member.entity';
 
 @Injectable()
 export class ApplicationService {
@@ -14,14 +15,17 @@ export class ApplicationService {
         private readonly userRepository: Repository<User>,
         @InjectRepository(Band)
         private readonly bandRepository: Repository<Band>,
+        @InjectRepository(Member)
+        private readonly memberRepository: Repository<Member>
     ) { }
 
-    async createApplication(userId: number, bandId: number): Promise<Application> {
+    async createApplication(userId: number, bandId: number, role: string): Promise<Application> {
         const user = await this.userRepository.findOne({ where: { id: userId } });
         const band = await this.bandRepository.findOne({ where: { id: bandId } });
         const application = new Application();
         application.user = user;
         application.band = band;
+        application.role = role;
         return this.applicationRepository.save(application);
     }
 
@@ -43,32 +47,61 @@ export class ApplicationService {
             user: application.user,
             band: application.band,
             status: application.status,
+            role: application.role
         }));
     }
 
-    async approveApplication(bandId: number, applicationId: number): Promise<Application> {
+    async approveApplication(bandId: number, applicationId: number, role: string): Promise<Member> {
         const application = await this.applicationRepository
             .createQueryBuilder('application')
             .leftJoinAndSelect('application.band', 'band')
+            .leftJoinAndSelect('application.user', 'user')
             .where('application.id = :id', { id: applicationId })
             .getOne();
-        if (application.band.id !== bandId) {
+
+        if (!application) {
+            throw new Error('Join request not found.');
+        }
+
+        if (!application.band || application.band.id !== bandId) {
             throw new Error('Join request does not belong to the specified band.');
         }
+
+        // Изменяем статус заявки на "approved" и сохраняем ее
         application.status = 'approved';
-        return this.applicationRepository.save(application);
+        application.role = role;
+
+        const savedApplication = await this.applicationRepository.save(application);
+
+        if (!savedApplication.user || !savedApplication.band) {
+            throw new Error('Invalid application data');
+        }
+
+        // Создаем объект Member на основе данных из заявки
+        const member = new Member();
+        member.role = role; // сохраняем значение роли из заявки
+        member.userName = savedApplication.user.userName;
+        member.user = savedApplication.user;
+        member.band = savedApplication.band;
+        console.log("member: ", member);
+        console.log("application: ", application);
+
+        const savedMember = await this.memberRepository.save(member);
+        await this.applicationRepository.delete(applicationId);
+        return savedMember;
     }
 
-    async rejectApplication(bandId: number, applicationId: number): Promise<Application> {
+    async rejectApplication(bandId: number, applicationId: number, role: string): Promise<Application> {
         const application = await this.applicationRepository
             .createQueryBuilder('application')
             .leftJoinAndSelect('application.band', 'band')
             .where('application.id = :id', { id: applicationId })
             .getOne();
-        if (application.band.id !== bandId) {
+        if (!application.band || application.band.id !== bandId) {
             throw new Error('Join request does not belong to the specified band.');
         }
         application.status = 'rejected';
+        application.role = role;
         return this.applicationRepository.save(application);
     }
 
@@ -97,4 +130,6 @@ export class ApplicationService {
 
         return band && band.userID === userId;
     }
+
+    
 }

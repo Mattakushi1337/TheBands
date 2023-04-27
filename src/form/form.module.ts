@@ -9,14 +9,16 @@ import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/user.entity';
+import { Repository } from 'typeorm';
+import { Band } from 'src/band/band.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Form, User]), JwtModule.register({
+    imports: [TypeOrmModule.forFeature([Form, User, Repository, Band]), JwtModule.register({
         secret: 'JWT_SECRET',
         signOptions: { expiresIn: '1d' },
       }), UserModule],
     controllers: [FormController],
-    providers: [FormService, AuthService, UserService],
+    providers: [FormService, AuthService, UserService, Repository],
     exports: [FormService]
 })
 export class FormModule { }

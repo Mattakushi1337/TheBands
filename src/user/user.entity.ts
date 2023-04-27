@@ -18,6 +18,9 @@ export class User {
     @Column()
     password: string;
 
+    @Column()
+    userName: string;
+
     @OneToOne(() => Form, form => form.user)
     form: Form;
 

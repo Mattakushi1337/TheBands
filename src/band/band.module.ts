@@ -8,10 +8,11 @@ import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/user.entity';
+import { Repository } from 'typeorm';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Band, User]),
+    TypeOrmModule.forFeature([Band, User, Repository]),
     JwtModule.register({
       secret: 'JWT_SECRET',
       signOptions: { expiresIn: '1d' },
@@ -19,7 +20,7 @@ import { User } from 'src/user/user.entity';
     UserModule,
   ],
   controllers: [BandController],
-  providers: [BandService, AuthService, UserService],
+  providers: [BandService, AuthService, UserService, Repository],
   exports: [BandService],
 })
 export class BandModule {}

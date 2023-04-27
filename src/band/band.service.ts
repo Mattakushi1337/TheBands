@@ -36,7 +36,7 @@ export class BandService {
         newBand.creatorId = user.id;
         newBand.bandName = band.bandName;
         newBand.description = band.description;
-         console.log(newBand);
+        console.log(newBand);
 
         const result = await this.bandRepository
             .createQueryBuilder()
@@ -60,6 +60,10 @@ export class BandService {
     async canEditband(userId: number, bandId: number): Promise<boolean> {
         const band = await this.bandRepository.findOne({ where: { id: bandId } });
         return band && band.userID === userId;
+    }
+
+    async getBand(id: number): Promise<Band> {
+        return this.bandRepository.findOne({ where: { id } });
     }
 }
 

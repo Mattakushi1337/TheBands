@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body, Param, Get, Patch, Req, Query, ForbiddenException } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Param, Get, Patch, Req, Query, ForbiddenException, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { ApplicationService } from './application.service';
 import { Request } from 'express';
@@ -12,9 +12,9 @@ export class ApplicationController {
     constructor(private readonly applicationService: ApplicationService) { }
 
     @Post(':bandId/join')
-    async createApplication(@Req() req, @Param('bandId') bandId: number) {
+    async createApplication(@Req() req, @Param('bandId') bandId: number, @Body() body: { role: string }) {
         const user = req.cookies.userId;
-        const application = await this.applicationService.createApplication(user, bandId);
+        const application = await this.applicationService.createApplication(user, bandId, body.role);
         return application;
     }
 
@@ -24,7 +24,7 @@ export class ApplicationController {
         const userId = parseInt(req.cookies.userId);
         console.log(`userId: ${userId}, bandId: ${bandId}`);
         if (!await this.applicationService.canAccessApplications(userId, parseInt(bandId))) {
-            throw new ForbiddenException(`User with id ${userId} cannot edit form with id ${bandId}`);
+            throw new ForbiddenException(`User with id ${userId} cannot do smth with band with id ${bandId}`);
         }
         const applications = await this.applicationService.getAllApplications(parseInt(bandId), userId);
         console.log(`applications: ${JSON.stringify(applications)}`);
@@ -35,16 +35,23 @@ export class ApplicationController {
 
 
     @Patch(':applicationId/approve')
-    async approveApplication(@Param('applicationId') applicationId: number, @Req() req: Request) {
+    async approveApplication(@Param('applicationId') applicationId: number, @Body() body: { role: string }, @Req() req: Request) {
         const user = req.cookies.user;
-        const result = await this.applicationService.approveApplication(user.bandId, applicationId);
+        console.log("con: ", user.bandId, applicationId, body.role, body);
+
+        const result = await this.applicationService.approveApplication(user.bandId, applicationId, body.role);
         return { message: 'Join request approved successfully', data: result };
     }
 
     @Patch(':applicationId/reject')
-    async rejectApplication(@Param('applicationId') applicationId: number, @Req() req: Request) {
+    async rejectApplication(@Param('applicationId') applicationId: number, @Body() body: { role: string }, @Req() req: Request) {
         const user = req.cookies.user;
-        const result = await this.applicationService.rejectApplication(user.bandId, applicationId);
+        console.log(user);
+
+        if (!user || user.bandId === undefined) {
+            throw new HttpException('User not authenticated or missing band ID', HttpStatus.UNAUTHORIZED);
+        }
+        const result = await this.applicationService.rejectApplication(user.bandId, applicationId, body.role);
         console.log(result);
 
         return { message: 'Join request rejected successfully', data: result };

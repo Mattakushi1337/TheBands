@@ -7,6 +7,13 @@ import { JwtStrategy } from 'src/guards/jwt.strategy';
 import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entity';
+import { Band } from 'src/band/band.entity';
+import { BandService } from 'src/band/band.service';
+import { Repository } from 'typeorm';
+import { UserModule } from 'src/user/user.module';
+import { BandModule } from 'src/band/band.module';
+import { AuthController } from './auth.controller';
+import { MemberService } from 'src/member/member.service';
 
 @Module({
     imports: [
@@ -16,9 +23,12 @@ import { User } from 'src/user/user.entity';
             signOptions: { expiresIn: '3600s' },
             
         }),
-        TypeOrmModule.forFeature([User]) // добавить эту строку
+        TypeOrmModule.forFeature([User, Band, Repository]),
+        UserModule,
+        BandModule
 
     ],
-    providers: [AuthService, LocalStrategy, JwtStrategy, UserService],
+    controllers: [AuthController],
+    providers: [AuthService, LocalStrategy, JwtStrategy, UserService, BandService, MemberService],
 })
 export class AuthModule { }
