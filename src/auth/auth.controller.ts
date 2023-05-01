@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Get, Req } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, Req, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
@@ -15,7 +15,7 @@ export class AuthController {
         const user = await this.authService.register(body.login, body.password, body.userName);
         res.cookie('access_token', user.access_token, { httpOnly: true, maxAge: 3600 * 1000 });
         console.log('User created:', user);
-        return res.send(user);
+        return res.send({ success: true, user });
     }
 
     @Post('login')
@@ -28,9 +28,13 @@ export class AuthController {
         if (user && user.bandId) {
             res.cookie('bandId', user.bandId, { httpOnly: true, maxAge: 3600 * 1000 });
         }
-        console.log(user);
-        
-        return res.send(user);
+        return res.send({ success: true, user });
+    }
+
+    @Get('checklogin')
+    async checkIfLoginTaken(@Query('login') login: string): Promise<{ isTaken: boolean }> {
+        const user = await this.userService.findByLogin(login);
+        return { isTaken: !!user };
     }
 
     @Post('logout')
