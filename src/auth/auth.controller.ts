@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Res, Get, Req, Query } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Post, Body, Res, Get, Req, Query, UnauthorizedException } from '@nestjs/common';
+import { Response, Request } from 'express';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
+
 
 
 @Controller('auth')
@@ -45,6 +46,19 @@ export class AuthController {
         res.clearCookie('bandId');
         return res.send('Вы успешно вышли из аккаунта.');
     }
+
+
+    @Get('user')
+    async getCurrentUser(@Req() req: Request): Promise<User> {
+      const userId = req.cookies.userId;
+  
+      if (!userId) {
+        throw new UnauthorizedException('User not authenticated.');
+      }
+  
+      return this.userService.findById(userId);
+    }
+  
 
     @Get('/all')
     async findAll(): Promise<User[]> {

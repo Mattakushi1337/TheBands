@@ -50,6 +50,8 @@ export class BandService {
 
     async update(id: number, form: Band): Promise<Band> {
         await this.bandRepository.update(id, form);
+        console.log("ddd", await this.bandRepository.update(id, form), "aaa", await this.bandRepository.findOne({ where: { id } }));
+
         return await this.bandRepository.findOne({ where: { id } });
     }
 

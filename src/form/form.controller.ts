@@ -30,12 +30,14 @@ export class FormController {
     @UseGuards(JwtGuard)
     @Put(':id')
     async update(@Param('id') id: string, @Body() form: Form, @Req() req: Request) {
-        console.log('req.user:', req.user); // <--- добавьте эту строку
+        console.log('req.user:', req.user);
         const userId = req.cookies.userId;
         if (!await this.formService.canEditForm(parseInt(userId), parseInt(id))) {
             throw new ForbiddenException(`User with id ${userId} cannot edit form with id ${id}`);
         }
         const updatedForm = await this.formService.update(parseInt(id), form);
+        console.log(updatedForm);
+        
         return updatedForm;
     }
 
@@ -52,6 +54,8 @@ export class FormController {
 
     @Get('form/all')
     async allForms(): Promise<Form[]> {
+        console.log(await this.formService.allForms());
+
         return await this.formService.allForms();
     }
 

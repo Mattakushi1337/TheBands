@@ -102,7 +102,7 @@ export class ApplicationService {
         }
         application.status = 'rejected';
         application.role = role;
-        return this.applicationRepository.save(application);
+        return this.applicationRepository.remove(application);
     }
 
     async getApplicationStatus(applicationId: number) {

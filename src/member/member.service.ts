@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Member } from './member.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -13,7 +13,7 @@ export class MemberService {
         private readonly memberRepository: Repository<Member>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        @InjectRepository(Band)
+        @Inject(BandService)
         private readonly bandService: BandService
     ) { }
 
@@ -43,5 +43,13 @@ export class MemberService {
             throw new NotFoundException(`Member with id ${id} not found`);
         }
         return member;
+    }
+
+    async getAllMembers(bandId: number): Promise<Member[]> {
+        const members = await this.memberRepository.createQueryBuilder('member')
+            .leftJoinAndSelect('member.band', 'band')
+            .where('band.id = :bandId', { bandId })
+            .getMany();
+        return members;
     }
 }

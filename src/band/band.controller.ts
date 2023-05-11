@@ -51,6 +51,8 @@ export class BandController {
             throw new ForbiddenException(`User with id ${userId} cannot edit form with id ${id}`);
         }
         const updatedForm = await this.bandService.update(parseInt(id), form);
+        console.log(updatedForm);
+        
         return updatedForm;
     }
 
