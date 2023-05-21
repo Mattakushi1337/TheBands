@@ -27,6 +27,7 @@ export class AuthService {
     const payload = { sub: user.id };
     const access_token = this.jwtService.sign(payload);
     const bandId = await this.getUserBandId(user.id);
+    console.log("BandId gen", bandId);
     return { access_token, userId: user.id, bandId };
   }
 
@@ -41,6 +42,6 @@ export class AuthService {
 
   async getUserBandId(userId: number): Promise<number> {
     const band = await this.bandRepository.findOne({ where: { creatorId: userId } });
-    return band?.creatorId;
+    return band?.id;
   }
 }

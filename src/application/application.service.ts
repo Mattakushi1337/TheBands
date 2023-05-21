@@ -35,7 +35,7 @@ export class ApplicationService {
                 id: bandId,
                 creatorId: userId,
             },
-            relations: ['applications'],
+            relations: ['applications', 'applications.user'],
         });
 
         if (!band) {
@@ -45,6 +45,7 @@ export class ApplicationService {
         return band.applications.map(application => ({
             id: application.id,
             user: application.user,
+            userName: application.user.userName,
             band: application.band,
             status: application.status,
             role: application.role
@@ -62,6 +63,7 @@ export class ApplicationService {
         if (!application) {
             throw new Error('Join request not found.');
         }
+        console.log(application.band.id, bandId);
 
         if (!application.band || application.band.id !== bandId) {
             throw new Error('Join request does not belong to the specified band.');
@@ -131,5 +133,5 @@ export class ApplicationService {
         return band && band.userID === userId;
     }
 
-    
+
 }

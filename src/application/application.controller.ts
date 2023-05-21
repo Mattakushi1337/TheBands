@@ -37,6 +37,7 @@ export class ApplicationController {
     @Patch(':applicationId/approve')
     async approveApplication(@Param('applicationId') applicationId: number, @Body() body: { role: string }, @Req() req: Request) {
         const user = req.cookies.user;
+        console.log("req.cookies.user:", user);
         console.log("con: ", user.bandId, applicationId, body.role, body);
 
         const result = await this.applicationService.approveApplication(user.bandId, applicationId, body.role);
