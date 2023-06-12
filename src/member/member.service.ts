@@ -20,7 +20,7 @@ export class MemberService {
     async delete(id: number, bandId: number, userId: number): Promise<void> {
         // Проверяем, что пользователь является создателем группы
         const band = await this.bandService.getBand(bandId);
-        console.log(userId, band.userID);
+        console.log(band);
 
         if (band.userID != userId) {
             throw new ForbiddenException(`User with id ${userId} cannot delete member with id ${id}`);
@@ -35,21 +35,28 @@ export class MemberService {
     }
 
     async getMember(id: number): Promise<Member> {
-        const member = await this.memberRepository.createQueryBuilder('member')
+        const member = await this.memberRepository
+            .createQueryBuilder('member')
             .leftJoinAndSelect('member.band', 'band')
+            .leftJoinAndSelect('member.user', 'user') // Join with the User table
             .where('member.id = :id', { id })
             .getOne();
+
         if (!member) {
             throw new NotFoundException(`Member with id ${id} not found`);
         }
+
         return member;
     }
 
     async getAllMembers(bandId: number): Promise<Member[]> {
-        const members = await this.memberRepository.createQueryBuilder('member')
+        const members = await this.memberRepository
+            .createQueryBuilder('member')
             .leftJoinAndSelect('member.band', 'band')
+            .leftJoinAndSelect('member.user', 'user') // Join with the User table
             .where('band.id = :bandId', { bandId })
             .getMany();
+
         return members;
     }
 }

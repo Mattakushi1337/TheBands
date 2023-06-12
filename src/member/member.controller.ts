@@ -14,10 +14,8 @@ export class MemberController {
   async delete(@Param('id') id: string, @Req() req: any): Promise<void> {
     const userId = req.cookies.userId;
     const memberId = parseInt(id);
-
     const member = await this.memberService.getMember(memberId);
     const bandId = member.band.id;
-
     await this.memberService.delete(memberId, bandId, userId);
   }
 

@@ -10,7 +10,6 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-
     @Column({ unique: true })
     @IsNotEmpty()
     login: string;

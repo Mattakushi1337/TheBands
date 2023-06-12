@@ -3,20 +3,25 @@ import { JwtGuard } from 'src/guards/jwt.guard';
 import { ApplicationService } from './application.service';
 import { Request } from 'express';
 import { Application } from './application.entity';
+import { BandService } from 'src/band/band.service';
+import { Repository } from 'typeorm';
+import { User } from 'src/user/user.entity';
 
 @Controller('applications')
 
 
 @UseGuards(JwtGuard)
 export class ApplicationController {
-    constructor(private readonly applicationService: ApplicationService) { }
+    constructor(private readonly applicationService: ApplicationService, private readonly bandService: BandService, private readonly userRepository: Repository<User>) { }
 
     @Post(':bandId/join')
     async createApplication(@Req() req, @Param('bandId') bandId: number, @Body() body: { role: string }) {
         const user = req.cookies.userId;
         const application = await this.applicationService.createApplication(user, bandId, body.role);
+
         return application;
     }
+
 
 
     @Get(':bandId')

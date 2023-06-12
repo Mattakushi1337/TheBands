@@ -10,9 +10,6 @@ export class Member {
   @Column()
   role: string;
 
-  @Column()
-  userName: string;
-
   @ManyToOne(() => User, user => user.member)
   user: User;
 

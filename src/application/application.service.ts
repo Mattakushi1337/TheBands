@@ -5,6 +5,7 @@ import { Application } from './application.entity';
 import { User } from 'src/user/user.entity';
 import { Band } from 'src/band/band.entity';
 import { Member } from 'src/member/member.entity';
+import { Request } from 'express';
 
 @Injectable()
 export class ApplicationService {
@@ -52,6 +53,7 @@ export class ApplicationService {
         }));
     }
 
+
     async approveApplication(bandId: number, applicationId: number, role: string): Promise<Member> {
         const application = await this.applicationRepository
             .createQueryBuilder('application')
@@ -82,7 +84,6 @@ export class ApplicationService {
         // Создаем объект Member на основе данных из заявки
         const member = new Member();
         member.role = role; // сохраняем значение роли из заявки
-        member.userName = savedApplication.user.userName;
         member.user = savedApplication.user;
         member.band = savedApplication.band;
         console.log("member: ", member);
