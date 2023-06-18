@@ -1,14 +1,14 @@
 import { Application } from 'src/application/application.entity';
 import { Member } from 'src/member/member.entity';
 import { User } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Band {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User, user => user.band)
+    @ManyToOne(() => User, user => user.band)
     user: User;
 
     @Column()

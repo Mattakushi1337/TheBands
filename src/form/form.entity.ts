@@ -1,16 +1,16 @@
 import { User } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Form {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User, user => user.form)
+  @ManyToOne(() => User, user => user.form)
   user: User;
 
   @Column()
-  userID: number; 
+  userID: number;
 
   @Column()
   userName: string;
