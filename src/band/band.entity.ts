@@ -23,6 +23,9 @@ export class Band {
     @Column()
     creatorId: number;
 
+    @Column()
+    contact: string;
+
     @OneToMany(() => Member, member => member.band)
     members: Member[];
 

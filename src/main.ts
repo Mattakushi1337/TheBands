@@ -6,7 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'http://192.168.1.239:3000',
+    origin: 'http://192.168.1.106:3000',
     credentials: true,
   });
   app.use(cookieParser());

@@ -36,6 +36,7 @@ export class BandService {
         newBand.creatorId = user.id;
         newBand.bandName = band.bandName;
         newBand.description = band.description;
+        newBand.contact = band.contact;
         console.log(newBand);
 
         const result = await this.bandRepository
