@@ -6,7 +6,7 @@ export class Form {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User, user => user.form)
+  @ManyToOne(() => User, user => user.form)
   user: User;
 
   @Column()
