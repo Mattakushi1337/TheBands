@@ -8,7 +8,7 @@ export class Band {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, user => user.band)
+    @OneToOne(() => User, user => user.band)
     user: User;
 
     @Column()

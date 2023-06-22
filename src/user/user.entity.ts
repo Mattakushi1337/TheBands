@@ -20,10 +20,10 @@ export class User {
     @Column()
     userName: string;
 
-    @OneToMany(() => Form, form => form.user)
+    @OneToOne(() => Form, form => form.user)
     form: Form;
 
-    @OneToMany(() => Band, band => band.user)
+    @OneToOne(() => Band, band => band.user)
     band: Band;
 
     @OneToMany(() => Member, member => member.user)
