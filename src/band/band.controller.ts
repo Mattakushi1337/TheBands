@@ -44,16 +44,16 @@ export class BandController {
 
     @UseGuards(JwtGuard)
     @Put(':id')
-    async update(@Param('id') id: string, @Body() form: Band, @Req() req: any) {
+    async update(@Param('id') id: string, @Body() band: Band, @Req() req: any) {
         console.log('req.user:', req.user);
         const userId = req.cookies.userId;
         if (!await this.bandService.canEditband(parseInt(userId), parseInt(id))) {
             throw new ForbiddenException(`User with id ${userId} cannot edit form with id ${id}`);
         }
-        const updatedForm = await this.bandService.update(parseInt(id), form);
-        console.log(updatedForm);
+        const updatedBand = await this.bandService.update(parseInt(id), band);
+        console.log(updatedBand);
         
-        return updatedForm;
+        return updatedBand;
     }
 
     @UseGuards(JwtGuard)
